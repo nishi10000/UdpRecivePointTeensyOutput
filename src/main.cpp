@@ -18,12 +18,11 @@
 
   Created 2020/04/24
   By Yu Nishihara
-   
 */
 #include <SPI.h>          // needed for Arduino versions later than 0018
 #include <Ethernet.h>
 #include <EthernetUdp.h>  // UDP library from: bjoern@cs.stanford.edu 12/30/2008
-#include <string.h> 
+#include <string.h>
 #include <Arduino.h>
 
 #define RSTn 9  //WIZ850io resetpin
@@ -42,7 +41,7 @@
 //#define DEBUG //デバッグ時に記載コメントアウトする事によってifdef解除
 
 /*グローバル変数*/
-byte mac[] = {  
+byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 IPAddress ip(192, 168,11,177);
 
@@ -66,7 +65,7 @@ void setupToWIZ850io(){
 void setup() {
   setupToWIZ850io();
   analogWriteResolution(8);  //pwmの分解能が0～255に変更される。
-  // start the Ethernet and UDP:  
+  // start the Ethernet and UDP:
   Ethernet.begin(mac,ip);
   Udp.begin(localPort);
   #ifdef DEBUG
@@ -89,7 +88,7 @@ void udpReciver(){
       Serial.print("From ");
       IPAddress remote = Udp.remoteIP();
     #endif
-    for (int i =0; i < packetSize; i++)
+    for (int i =0; i < 4; i++)
     {
       #ifdef DEBUG
         Serial.print(remote[i], DEC);
@@ -113,7 +112,7 @@ void udpReciver(){
     Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
     Udp.write(ReplyBuffer);
     Udp.endPacket();
-  }  
+  }
 }
 
 //PacketBufferに基づきGalvos電圧の調整、LaserのON/OFFを行う。
@@ -121,12 +120,28 @@ void bufferOperation(){
   if(strlen(PacketBuffer)==0){
     return;
   }
-  //analogWrite(LASER_OUTPUT_PIN,strcmp(PacketBuffer));
+  int brightness=int(PacketBuffer[2]);
+  int xCoordinate=int(PacketBuffer[0]);
+  int yCoordinate=int(PacketBuffer[1]);
+  #ifdef DEBUG
+    Serial.print("xCoordinate:");
+    Serial.println(xCoordinate);
+    Serial.print("yCoordinate:");
+    Serial.println(yCoordinate);
+    Serial.print("brightness:");
+    Serial.println(brightness);
+  #endif
+
+  analogWrite(X_GAlVO,xCoordinate);
+  analogWrite(Y_GAlVO,yCoordinate);
+  analogWrite(LASER_OUTPUT_PIN,brightness);
+
+
 }
 
 void loop() {
   udpReciver();  //PacketBufferにUDPのデータを格納する。
-  //bufferを読み込む。
+  bufferOperation();//bufferを読み込む。
   //Teensyから電圧を出力する。
 
 }
