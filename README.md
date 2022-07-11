@@ -1,4 +1,4 @@
-# UdpRecivvePointTeensyOutput
+# UdpRecivePointTeensyOutput
   UdpRecivePointOutput
   UDP_Receive_Laser
   UDPコマンドを受けて動作を行う。Galvoの電圧制御,LaserのON/OFFを制御する。
