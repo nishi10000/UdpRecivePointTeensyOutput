@@ -17,7 +17,7 @@
   * pinA21 X_Galvo
 
   Created 2020/04/24
-  By Yu Nishihara
+  By Project Author
 */
 #include <SPI.h>          // needed for Arduino versions later than 0018
 #include <Ethernet.h>
